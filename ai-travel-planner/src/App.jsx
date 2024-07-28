@@ -2,13 +2,17 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
+import Hero from './components/custom/Hero';
+// import Header from './components/custom/Header';
+
 
 function App() {
   // const [count, setCount] = useState(0)
 
   return (
     <>
-      <h2>Welcome to AI Trip Planner</h2>
+    {/* <Header/> */}
+      <Hero/>
     </>
   )
 }

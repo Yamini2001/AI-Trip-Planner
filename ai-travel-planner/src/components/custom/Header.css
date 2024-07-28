@@ -1,0 +1,18 @@
+/* App.css or a separate CSS file */
+
+.header {
+    display: flex;
+    justify-content: start;
+    align-items: left;
+    height: 100px; /* Adjust height as needed */
+    background-color: #f8f9fa; /* Adjust background color as needed */
+  }
+  
+  .header img {
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    align-items: left;
+    margin-left: 20px;
+  }
+  
