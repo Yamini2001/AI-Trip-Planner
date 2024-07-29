@@ -1,18 +1,36 @@
-/* App.css or a separate CSS file */
-
 .header {
-    display: flex;
-    justify-content: start;
-    align-items: left;
-    height: 100px; /* Adjust height as needed */
-    background-color: #f8f9fa; /* Adjust background color as needed */
-  }
-  
-  .header img {
-    max-width: 100%;
-    height: auto;
-    max-height: 100%;
-    align-items: left;
-    margin-left: 20px;
-  }
-  
+  background-color: white;
+  color: black;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header img {
+  max-width: 9%;
+  height: auto;
+  max-height: 50%;
+  align-items: left;
+  margin-left: 5px;
+  background: none;
+  border-radius: 10px;
+}
+.button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 40px;
+  border-radius: 10px;
+}
+
+.button:hover {
+  background-color: white;
+  color: black;
+}
