@@ -1,17 +1,18 @@
-// import React from 'react';
 import { Button } from "../ui/Button";
-import './Hero.css'; 
 
 function Hero() {
   return (
-    <div className="hero">
-      <h1>
-        <span>Discover Your Next Adventure with AI:</span><br/> Personalized Itineraries at Your Fingertips
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white text-black gap-9">
+      <h1 className="font-extrabold text-4xl lg:text-5xl text-center mt-[-19rem]">
+        <span className="text-red-500">Discover Your Next Adventure with AI:</span>
+        <br /> Personalized Itineraries at Your Fingertips
       </h1>
-      <p className="text">
+      <p className="text-sm lg:text-lg text-black text-center">
         Your personal trip planner and travel curator, creating custom itineraries tailored to your interests and budget.
       </p>
-      <Button className="button">Get Started, Its Free</Button>
+      <Button className="mt-8 bg-black text-white py-2 px-4 rounded hover:bg-white hover:text-black">
+        Get Started, It&#39;s Free
+      </Button>
     </div>
   );
 }
