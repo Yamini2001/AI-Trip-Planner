@@ -42,3 +42,4 @@ Make sure you have [Node.js](https://nodejs.org/) and npm installed on your mach
    ```sh
    git clone https://github.com/your-username/ai-trip-planner.git
 
+
