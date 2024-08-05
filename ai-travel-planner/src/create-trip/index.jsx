@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { SelectBudgetOptions, selectTravelList } from '../constants/options';
 import { toast } from 'react-toastify';
+import { chatSession } from '../service/AIModal';
+
+const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
 function CreateTrip() {
   const [query, setQuery] = useState('');
@@ -15,20 +18,38 @@ function CreateTrip() {
   const handleData = (name, value) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value
+      [name]: value,
     }));
   };
 
   useEffect(() => {
-    console.log(formData);
+    console.log('Form data:', formData);
   }, [formData]);
 
-  const OnGenerateTrip = () => {
-    if (formData.days > 5&&!formData?.location ||! formData?.budget||formData.traveler) {
-      toast("Please fill all the details");
+  const OnGenerateTrip = async () => {
+    if (!formData?.location || !formData?.days || !formData?.budget || !formData?.traveler) {
+      toast.error("Please fill all the details");
       return;
     }
+
     console.log("Generating trip with data:", formData);
+
+    const FINAL_PROMPT = AI_PROMPT
+      .replace('{location}', formData?.location?.label || '')
+      .replace('{totalDays}', formData?.days || '')
+      .replace('{traveler}', formData?.traveler || '')
+      .replace('{budget}', formData?.budget || '');
+
+    console.log("Final prompt:", FINAL_PROMPT);
+
+    try {
+      const messages = [{ role: 'user', content: FINAL_PROMPT }];
+      const result = await chatSession.sendMessage(messages);
+      console.log("Generated content:", result?.response?.text());
+    } catch (error) {
+      console.error("Error generating trip:", error);
+      toast.error("Error generating trip. Please try again.");
+    }
   };
 
   const handleInputChange = async (e) => {
@@ -41,9 +62,9 @@ function CreateTrip() {
           params: {
             key: 'pk.c51ba700c7aa3288f19b95fbaddbaeff',
             q: value,
-            limit: 25,
-            dedupe: 1
-          }
+            limit: 50,
+            dedupe: 1,
+          },
         });
         setSuggestions(response.data);
       } catch (error) {
@@ -58,12 +79,13 @@ function CreateTrip() {
     setPlace(suggestion);
     setQuery(suggestion.display_name);
     setSuggestions([]);
-    handleData('destination', suggestion.display_name);
+    handleData('location', suggestion);
   };
 
   const handleDaysChange = (e) => {
-    setDays(e.target.value);
-    handleData('days', e.target.value);
+    const value = e.target.value;
+    setDays(value);
+    handleData('days', value);
   };
 
   const handleBudgetClick = (item) => {
@@ -79,7 +101,9 @@ function CreateTrip() {
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10">
       <h2 className="font-bold text-3xl">Tell us your travel preferences🏕️🌴</h2>
-      <p className="mt-3 text-gray-500 text-xl">Just provide basic information, and our trip planner will generate a customized itinerary based on your preferences.</p>
+      <p className="mt-3 text-gray-500 text-xl">
+        Just provide basic information, and our trip planner will generate a customized itinerary based on your preferences.
+      </p>
       <div className="mt-20 flex flex-col gap-9">
         <div className="w-full md:w-1/2 lg:w-1/2">
           <h2 className="text-xl my-3 font-medium">What is your destination of choice?</h2>
@@ -137,8 +161,8 @@ function CreateTrip() {
         <h2 className="text-xl my-3 font-medium">Who do you plan on traveling with on your next adventure?</h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 justify-center">
           {selectTravelList.map((item, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               onClick={() => handleTravelerClick(item)}
               className={`p-2 border cursor-pointer rounded-lg text-center w-80 transition-all duration-200
                 ${selectedTraveler === item.people ? 'shadow-xl border-2 border-black' : 'hover:shadow-lg border-gray-300'}
@@ -152,7 +176,9 @@ function CreateTrip() {
         </div>
       </div>
       <div className="my-10 flex justify-start">
-        <button onClick={OnGenerateTrip} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">Generate Trip</button>
+        <button onClick={OnGenerateTrip} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+          Generate Trip
+        </button>
       </div>
     </div>
   );
