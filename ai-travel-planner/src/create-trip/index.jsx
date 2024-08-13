@@ -28,7 +28,7 @@ function CreateTrip() {
 
   const OnGenerateTrip = async () => {
     if (!formData?.location || !formData?.days || !formData?.budget || !formData?.traveler) {
-      toast.error("Please fill all the details");
+      toast("Please fill all the details");
       return;
     }
 
