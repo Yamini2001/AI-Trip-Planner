@@ -32,8 +32,6 @@ function CreateTrip() {
       return;
     }
 
-    console.log("Generating trip with data:", formData);
-
     const FINAL_PROMPT = AI_PROMPT
       .replace('{location}', formData?.location?.label || '')
       .replace('{totalDays}', formData?.days || '')
@@ -43,12 +41,12 @@ function CreateTrip() {
     console.log("Final prompt:", FINAL_PROMPT);
 
     try {
-      const messages = [{ role: 'user', content: FINAL_PROMPT }];
-      const result = await chatSession.sendMessage(messages);
-      console.log("Generated content:", result?.response?.text());
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const responseText = result?.response?.text();
+      console.log(responseText);
     } catch (error) {
-      console.error("Error generating trip:", error);
-      toast.error("Error generating trip. Please try again.");
+      console.error('Error generating trip:', error);
+      toast("An error occurred while generating the trip");
     }
   };
 
