@@ -3,6 +3,13 @@ import axios from 'axios';
 import { SelectBudgetOptions, selectTravelList } from '../constants/options';
 import { toast } from 'react-toastify';
 import { chatSession } from '../service/AIModal';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
@@ -14,6 +21,7 @@ function CreateTrip() {
   const [formData, setFormData] = useState({});
   const [selectedBudget, setSelectedBudget] = useState('');
   const [selectedTraveler, setSelectedTraveler] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleData = (name, value) => {
     setFormData((prevFormData) => ({
@@ -26,7 +34,13 @@ function CreateTrip() {
     console.log('Form data:', formData);
   }, [formData]);
 
-  const OnGenerateTrip = async () => {
+  const onGenerateTrip = async () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      setOpenDialog(true);
+      return;
+    }
+
     if (!formData?.location || !formData?.days || !formData?.budget || !formData?.traveler) {
       toast("Please fill all the details");
       return;
@@ -42,7 +56,7 @@ function CreateTrip() {
 
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
-      const responseText = result?.response?.text();
+      const responseText = await result?.response?.text();
       console.log(responseText);
     } catch (error) {
       console.error('Error generating trip:', error);
@@ -94,6 +108,10 @@ function CreateTrip() {
   const handleTravelerClick = (item) => {
     setSelectedTraveler(item.people);
     handleData('traveler', item.people);
+  };
+
+  const closeDialog = () => {
+    setOpenDialog(false);
   };
 
   return (
@@ -174,10 +192,20 @@ function CreateTrip() {
         </div>
       </div>
       <div className="my-10 flex justify-start">
-        <button onClick={OnGenerateTrip} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+        <button onClick={onGenerateTrip} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
           Generate Trip
         </button>
       </div>
+      <Dialog open={openDialog} onOpenChange={closeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>User Not Logged In</DialogTitle>
+            <DialogDescription>
+              Please log in to generate a trip. 
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
