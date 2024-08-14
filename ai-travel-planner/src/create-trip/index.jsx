@@ -74,7 +74,7 @@ function CreateTrip() {
   };
 
   const GetUserProfile=(tokenInfo)=>{
-    axios.get(`http://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`,{
+    axios.get(`http://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`,{
       headers:{
         Authorization: `Bearer ${tokenInfo?.access_token}`,
         Accept: 'Application/json'
@@ -239,11 +239,6 @@ function CreateTrip() {
 
 </DialogDescription>
     </DialogHeader>
-    {/* <DialogFooter>
-      <button onClick={() => setOpenDialog(false)} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-600">
-        Close
-      </button>
-    </DialogFooter> */}
   </DialogContent>
 </Dialog>
     </div>
