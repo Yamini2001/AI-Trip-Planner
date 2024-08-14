@@ -8,8 +8,9 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from '../components/ui/dialog';
+  DialogFooter,
+} from "@/components/ui/dialog"
+
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
@@ -110,10 +111,6 @@ function CreateTrip() {
     handleData('traveler', item.people);
   };
 
-  const closeDialog = () => {
-    setOpenDialog(false);
-  };
-
   return (
     <div className="sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10">
       <h2 className="font-bold text-3xl">Tell us your travel preferences🏕️🌴</h2>
@@ -196,16 +193,20 @@ function CreateTrip() {
           Generate Trip
         </button>
       </div>
-      <Dialog open={openDialog} onOpenChange={closeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>User Not Logged In</DialogTitle>
-            <DialogDescription>
-              Please log in to generate a trip. 
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <Dialog open={openDialog} onOpenChange={() => setOpenDialog(false)}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogDescription>
+        Please log in to generate a trip.
+      </DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <button onClick={() => setOpenDialog(false)} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-600">
+        Close
+      </button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
     </div>
   );
 }
