@@ -81,6 +81,9 @@ function CreateTrip() {
       }
     }).then((resp)=>{
       console.log(resp);
+      localStorage.setItem('user',JSON.stringify(resp.data));
+      setOpenDialog(false);
+      onGenerateTrip();
 
     })
   }
