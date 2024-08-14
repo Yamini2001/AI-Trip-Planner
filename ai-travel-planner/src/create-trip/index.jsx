@@ -8,8 +8,11 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogFooter,
 } from "@/components/ui/dialog"
+import travelPlannerLogo from '@/assets/travelplanner.png';
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from '@react-oauth/google';
+
 
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
@@ -34,6 +37,11 @@ function CreateTrip() {
   useEffect(() => {
     console.log('Form data:', formData);
   }, [formData]);
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onError: (error) => console.log(error),
+  });
 
   const onGenerateTrip = async () => {
     const user = localStorage.getItem('user');
@@ -64,6 +72,18 @@ function CreateTrip() {
       toast("An error occurred while generating the trip");
     }
   };
+
+  const GetUserProfile=(tokenInfo)=>{
+    axios.get(`http://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`,{
+      headers:{
+        Authorization: `Bearer ${tokenInfo?.access_token}`,
+        Accept: 'Application/json'
+      }
+    }).then((resp)=>{
+      console.log(resp);
+
+    })
+  }
 
   const handleInputChange = async (e) => {
     const value = e.target.value;
@@ -196,15 +216,31 @@ function CreateTrip() {
       <Dialog open={openDialog} onOpenChange={() => setOpenDialog(false)}>
   <DialogContent>
     <DialogHeader>
-      <DialogDescription>
-        Please log in to generate a trip.
-      </DialogDescription>
+    <DialogDescription className="flex flex-col items-start">
+  <div className="flex items-center mb-2">
+    <img src={travelPlannerLogo} alt="travelplanner" className="h-8 w-14" />
+    <span className="ml-2 text-[#0973BC] text-2xl font-bold tracking-wide">
+      travel<span className="text-[#1C3B5C]">planner</span>
+    </span>
+  </div>
+  <h2 className="font-bold text-lg text-gray-700 mt-2 mb-1">
+    Sign In With Google
+  </h2>
+  <p className="text-gray-600 text-sm">
+    Sign in to the App with Google authentication securely
+  </p>
+  <button onClick={login} className="w-full mt-5 flex gap-4 items-center justify-center bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800">
+  <FcGoogle className="h-6 w-6 mr-2" />
+  <span className="text-center">Sign In With Google</span>
+</button>
+
+</DialogDescription>
     </DialogHeader>
-    <DialogFooter>
+    {/* <DialogFooter>
       <button onClick={() => setOpenDialog(false)} className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-600">
         Close
       </button>
-    </DialogFooter>
+    </DialogFooter> */}
   </DialogContent>
 </Dialog>
     </div>
