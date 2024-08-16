@@ -3,17 +3,12 @@ import axios from 'axios';
 import { SelectBudgetOptions, selectTravelList } from '../constants/options';
 import { toast } from 'react-toastify';
 import { chatSession } from '../service/AIModal';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader,DialogDescription } from "@/components/ui/dialog";
 import travelPlannerLogo from '@/assets/travelplanner.png';
 import { FcGoogle } from "react-icons/fc";
 import { useGoogleLogin } from '@react-oauth/google';
-
-
+import { setDoc, doc } from 'firebase/firestore';
+import { db } from "@/service/firebaseConfig"; 
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
@@ -27,6 +22,7 @@ function CreateTrip() {
   const [selectedTraveler, setSelectedTraveler] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
 
+  // Helper to update form data
   const handleData = (name, value) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -39,14 +35,15 @@ function CreateTrip() {
   }, [formData]);
 
   const login = useGoogleLogin({
-    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onSuccess: (tokenResponse) => GetUserProfile(tokenResponse),
     onError: (error) => console.log(error),
   });
 
+  // Function to generate trip plan
   const onGenerateTrip = async () => {
     const user = localStorage.getItem('user');
     if (!user) {
-      setOpenDialog(true);
+      setOpenDialog(true); // Open dialog if user is not logged in
       return;
     }
 
@@ -66,24 +63,48 @@ function CreateTrip() {
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
       const responseText = await result?.response?.text();
-      console.log(responseText);
+      console.log("AI Response:", responseText);
+      // Save AI-generated trip data
+      await saveAITrip(responseText);
     } catch (error) {
       console.error('Error generating trip:', error);
       toast("An error occurred while generating the trip");
     }
   };
 
-  const GetUserProfile=(tokenInfo)=>{
-    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`,{
-      headers:{
-        Authorization: `Bearer ${tokenInfo?.access_token}`,
-        Accept: 'Application/json'
-      }
-    }).then((resp)=>{
-      console.log(resp);
-    })
-  }
+  // Function to save AI-generated trip data
+  const saveAITrip = async (TripData) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const docId = Date.now().toString();
+    try {
+      await setDoc(doc(db, "AITrips", docId), {
+        userSelection: formData,
+        tripData: TripData,
+        userId: user?.id,
+      });
+      toast("Trip saved successfully!");
+    } catch (error) {
+      console.error('Error saving trip:', error);
+      toast("An error occurred while saving the trip");
+    }
+  };
 
+  // Function to get user profile after Google login
+  const GetUserProfile = (tokenInfo) => {
+    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo?.access_token}`,
+        Accept: 'Application/json',
+      },
+    }).then((resp) => {
+      console.log(resp);
+      localStorage.setItem('user', JSON.stringify(resp.data));
+    }).catch((error) => {
+      console.error('Error fetching user profile:', error);
+    });
+  };
+
+  // Handle location input change and suggestions
   const handleInputChange = async (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -107,6 +128,7 @@ function CreateTrip() {
     }
   };
 
+  // Handle suggestion click
   const handleSuggestionClick = (suggestion) => {
     setPlace(suggestion);
     setQuery(suggestion.display_name);
@@ -114,17 +136,20 @@ function CreateTrip() {
     handleData('location', suggestion);
   };
 
+  // Handle number of days input change
   const handleDaysChange = (e) => {
     const value = e.target.value;
     setDays(value);
     handleData('days', value);
   };
 
+  // Handle budget selection
   const handleBudgetClick = (item) => {
     setSelectedBudget(item.title);
     handleData('budget', item.title);
   };
 
+  // Handle traveler selection
   const handleTravelerClick = (item) => {
     setSelectedTraveler(item.people);
     handleData('traveler', item.people);
@@ -200,41 +225,50 @@ function CreateTrip() {
                 ${selectedTraveler === item.people ? 'shadow-xl border-2 border-black' : 'hover:shadow-lg border-gray-300'}
               `}
             >
-              <h2 className="text-4xl">{item.icons}</h2>
-              <h2 className="font-bold text-lg">{item.title}</h2>
+              <h2 className="text-2xl">{item.icons}</h2>
+              <h2 className="font-bold text-md">{item.people}</h2>
               <h2 className="text-sm text-gray-500">{item.desc}</h2>
             </div>
           ))}
         </div>
       </div>
-      <div className="my-10 flex justify-start">
-        <button onClick={onGenerateTrip} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+      <div>
+        <button
+          onClick={onGenerateTrip}
+          className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800"
+        >
           Generate Trip
         </button>
       </div>
-      <Dialog open={openDialog} onOpenChange={() => setOpenDialog(false)}>
+      {/* Dialog for login */}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
   <DialogContent>
     <DialogHeader>
-    <DialogDescription className="flex flex-col items-start">
-  <div className="flex items-center mb-2">
-    <img src={travelPlannerLogo} alt="travelplanner" className="h-8 w-14" />
-    <span className="ml-2 text-[#0973BC] text-2xl font-bold tracking-wide">
-      travel<span className="text-[#1C3B5C]">planner</span>
-    </span>
-  </div>
-  <h2 className="font-bold text-lg text-gray-700 mt-2 mb-1">
-    Sign In With Google
-  </h2>
-  <p className="text-gray-600 text-sm">
-    Sign in to the App with Google authentication securely
-  </p>
-  <button onClick={login} className="w-full mt-5 flex gap-4 items-center justify-center bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800">
-  <FcGoogle className="h-6 w-6 mr-2" />
-  <span className="text-center">Sign In With Google</span>
-</button>
-
-</DialogDescription>
+      <DialogDescription>
+        <img
+          src={travelPlannerLogo}
+          className="w-1/4 h-auto mx-auto rounded-lg mb-5"
+          alt="logo"
+        />
+        <h3 className="text-lg font-medium text-center">
+          Sign In With Google
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Sign in to the App with Google authentication securely
+        </p>
+      </DialogDescription>
     </DialogHeader>
+    <div className="mt-6 mb-2 flex justify-center">
+      <button
+        onClick={() => login()}
+        className="py-2 px-4 border border-black rounded-lg flex items-center justify-center gap-2"
+      >
+        <FcGoogle className="text-xl" />
+        <span className="text-sm font-medium text-muted-foreground">
+          Sign In With Google
+        </span>
+      </button>
+    </div>
   </DialogContent>
 </Dialog>
     </div>
