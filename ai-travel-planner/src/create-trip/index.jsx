@@ -10,6 +10,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { db } from "@/service/firebaseConfig";
 import travelPlannerLogo from '@/assets/travelplanner.png';
 
+
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
 function CreateTrip() {
@@ -21,7 +22,6 @@ function CreateTrip() {
   const [selectedBudget, setSelectedBudget] = useState('');
   const [selectedTraveler, setSelectedTraveler] = useState('');
   const [openDialog,setOpenDialog] = useState(false);
-  const [open, setOpen] = useState(true);
 
   // Helper to update form data
   const handleData = (name, value) => {
@@ -45,7 +45,6 @@ function CreateTrip() {
     const user = localStorage.getItem('user');
     if(!user){
       setOpenDialog(true);
-      console.log("openDialog state:", openDialog);
       return;
     }
 
@@ -239,8 +238,7 @@ function CreateTrip() {
         <button className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800" onClick={onGenerateTrip}>Generate Trip</button>
       </div>
       {/* Dialog for Google login */}
-      {/* <button onClick={() => setOpenDialog(true)}>Open Dialog</button> */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={openDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogDescription>
