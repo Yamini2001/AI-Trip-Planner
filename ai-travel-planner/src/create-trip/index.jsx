@@ -3,12 +3,12 @@ import axios from 'axios';
 import { SelectBudgetOptions, selectTravelList } from '../constants/options';
 import { toast } from 'react-toastify';
 import { chatSession } from '../service/AIModal';
-import { Dialog, DialogContent, DialogHeader,DialogDescription } from "@/components/ui/dialog";
-import travelPlannerLogo from '@/assets/travelplanner.png';
+import { Dialog, DialogContent, DialogHeader,DialogDescription} from "@/components/ui/dialog";
 import { FcGoogle } from "react-icons/fc";
 import { useGoogleLogin } from '@react-oauth/google';
 import { setDoc, doc } from 'firebase/firestore';
-import { db } from "@/service/firebaseConfig"; 
+import { db } from "@/service/firebaseConfig";
+import travelPlannerLogo from '@/assets/travelplanner.png';
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
 
@@ -20,7 +20,8 @@ function CreateTrip() {
   const [formData, setFormData] = useState({});
   const [selectedBudget, setSelectedBudget] = useState('');
   const [selectedTraveler, setSelectedTraveler] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog,setOpenDialog] = useState(false);
+  const [open, setOpen] = useState(true);
 
   // Helper to update form data
   const handleData = (name, value) => {
@@ -42,8 +43,9 @@ function CreateTrip() {
   // Function to generate trip plan
   const onGenerateTrip = async () => {
     const user = localStorage.getItem('user');
-    if (!user) {
-      setOpenDialog(true); // Open dialog if user is not logged in
+    if(!user){
+      setOpenDialog(true);
+      console.log("openDialog state:", openDialog);
       return;
     }
 
@@ -99,6 +101,7 @@ function CreateTrip() {
     }).then((resp) => {
       console.log(resp);
       localStorage.setItem('user', JSON.stringify(resp.data));
+      // setOpenDialog(false); 
     }).catch((error) => {
       console.error('Error fetching user profile:', error);
     });
@@ -232,45 +235,30 @@ function CreateTrip() {
           ))}
         </div>
       </div>
-      <div>
-        <button
-          onClick={onGenerateTrip}
-          className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800"
-        >
-          Generate Trip
-        </button>
+      <div className='my-10 justify-end flex'>
+        <button className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800" onClick={onGenerateTrip}>Generate Trip</button>
       </div>
-      {/* Dialog for login */}
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogDescription>
-        <img
-          src={travelPlannerLogo}
-          className="w-1/4 h-auto mx-auto rounded-lg mb-5"
-          alt="logo"
-        />
-        <h3 className="text-lg font-medium text-center">
-          Sign In With Google
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Sign in to the App with Google authentication securely
-        </p>
-      </DialogDescription>
-    </DialogHeader>
-    <div className="mt-6 mb-2 flex justify-center">
-      <button
-        onClick={() => login()}
-        className="py-2 px-4 border border-black rounded-lg flex items-center justify-center gap-2"
-      >
-        <FcGoogle className="text-xl" />
-        <span className="text-sm font-medium text-muted-foreground">
-          Sign In With Google
-        </span>
-      </button>
-    </div>
-  </DialogContent>
-</Dialog>
+      {/* Dialog for Google login */}
+      {/* <button onClick={() => setOpenDialog(true)}>Open Dialog</button> */}
+      <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogDescription>
+          <img
+              src={travelPlannerLogo}
+              className="w-1/4 h-auto mx-auto rounded-lg mb-5"
+              alt="logo"/>
+          <h2 className='font-bold text-lg mt-7'>Sign In With Google</h2>
+          <p>Sign in to the App with Google authentication securely.</p>
+          <button onClick={login}
+          className='w-full mt-5 flex gap-4 items-center'>
+            <FcGoogle className='h-7 w-7'/>
+            Sign In With Google</button>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+
+      </Dialog> 
     </div>
   );
 }
