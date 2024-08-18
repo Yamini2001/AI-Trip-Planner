@@ -9,6 +9,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { setDoc, doc } from 'firebase/firestore';
 import { db } from "@/service/firebaseConfig";
 import travelPlannerLogo from '@/assets/travelplanner.png';
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
@@ -77,6 +78,7 @@ function CreateTrip() {
 
   // Function to save AI-generated trip data
   const saveAITrip = async (TripData) => {
+    setLoading(true);
     const user = JSON.parse(localStorage.getItem('user'));
     const docId = Date.now().toString();
     try {
@@ -86,6 +88,7 @@ function CreateTrip() {
         userEmail:user?.email,
         id:docId
       });
+      setLoading(false);
       toast("Trip saved successfully!");
     } catch (error) {
       console.error('Error saving trip:', error);
@@ -237,7 +240,13 @@ function CreateTrip() {
         </div>
       </div>
       <div className='my-10 justify-end flex'>
-        <button className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800" onClick={onGenerateTrip}>Generate Trip</button>
+        <button disabled={loading}
+        className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800" onClick={onGenerateTrip}>
+        {
+              loading?
+              <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin'/>: 'Generate Trip'
+        }
+          </button>
       </div>
       {/* Dialog for Google login */}
       <Dialog open={openDialog}>
@@ -250,10 +259,12 @@ function CreateTrip() {
               alt="logo"/>
           <h2 className='font-bold text-lg mt-7'>Sign In With Google</h2>
           <p>Sign in to the App with Google authentication securely.</p>
-          <button onClick={login}
+          <button disabled={loading}
+          onClick={login}
           className='w-full mt-5 flex gap-4 items-center'>
-            <FcGoogle className='h-7 w-7'/>
-            Sign In With Google</button>
+              <FcGoogle className='h-7 w-7'/>
+              Sign In With Google
+            </button>
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
