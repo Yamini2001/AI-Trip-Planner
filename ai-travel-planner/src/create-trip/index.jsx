@@ -21,7 +21,8 @@ function CreateTrip() {
   const [formData, setFormData] = useState({});
   const [selectedBudget, setSelectedBudget] = useState('');
   const [selectedTraveler, setSelectedTraveler] = useState('');
-  const [openDialog,setOpenDialog] = useState(false);
+  const [openDialog,setOpenDialog] = useState();
+  const [loading,setLoading] = useState(false);
 
   // Helper to update form data
   const handleData = (name, value) => {
@@ -36,7 +37,7 @@ function CreateTrip() {
   }, [formData]);
 
   const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => GetUserProfile(tokenResponse),
+    onSuccess: (codeResp) => GetUserProfile(codeResp),
     onError: (error) => console.log(error),
   });
 
@@ -52,7 +53,7 @@ function CreateTrip() {
       toast("Please fill all the details");
       return;
     }
-
+    setLoading(true);
     const FINAL_PROMPT = AI_PROMPT
       .replace('{location}', formData?.location?.label || '')
       .replace('{totalDays}', formData?.days || '')
@@ -63,6 +64,7 @@ function CreateTrip() {
 
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
+      setLoading(false);
       const responseText = await result?.response?.text();
       console.log("AI Response:", responseText);
       // Save AI-generated trip data
@@ -81,7 +83,8 @@ function CreateTrip() {
       await setDoc(doc(db, "AITrips", docId), {
         userSelection: formData,
         tripData: TripData,
-        userId: user?.id,
+        userEmail:user?.email,
+        id:docId
       });
       toast("Trip saved successfully!");
     } catch (error) {
@@ -100,10 +103,9 @@ function CreateTrip() {
     }).then((resp) => {
       console.log(resp);
       localStorage.setItem('user', JSON.stringify(resp.data));
-      // setOpenDialog(false); 
-    }).catch((error) => {
-      console.error('Error fetching user profile:', error);
-    });
+      setOpenDialog(false); 
+      onGenerateTrip();
+    })
   };
 
   // Handle location input change and suggestions
