@@ -10,6 +10,7 @@ import { setDoc, doc } from 'firebase/firestore';
 import { db } from "@/service/firebaseConfig";
 import travelPlannerLogo from '@/assets/travelplanner.png';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import {useNavigate} from 'react-router-dom';
 
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
@@ -24,6 +25,7 @@ function CreateTrip() {
   const [selectedTraveler, setSelectedTraveler] = useState('');
   const [openDialog,setOpenDialog] = useState();
   const [loading,setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Helper to update form data
   const handleData = (name, value) => {
@@ -89,6 +91,7 @@ function CreateTrip() {
         id:docId
       });
       setLoading(false);
+      navigate('/view-trip/'+docId)
       toast("Trip saved successfully!");
     } catch (error) {
       console.error('Error saving trip:', error);
