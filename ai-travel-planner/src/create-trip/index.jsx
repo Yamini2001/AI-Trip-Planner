@@ -236,7 +236,7 @@ function CreateTrip() {
               `}
             >
               <h2 className="text-2xl">{item.icons}</h2>
-              <h2 className="font-bold text-md">{item.people}</h2>
+              <h2 className="font-bold text-lg">{item.title}</h2>
               <h2 className="text-sm text-gray-500">{item.desc}</h2>
             </div>
           ))}
