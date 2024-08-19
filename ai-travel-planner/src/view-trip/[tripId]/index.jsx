@@ -1,4 +1,4 @@
-// import React from 'react'
+import {useEffect} from 'react'
 import { useParams} from "react-router-dom";
 import {db} from "@/service/firebaseConfig";
 import {doc,getDoc} from 'firebase/firestore';
@@ -6,6 +6,10 @@ import {toast} from 'sonner';
 
 function ViewTrip() {
   const {tripId} = useParams();
+  useEffect(()=>{
+    tripId && GetTripData();
+
+  },[tripId])
   const GetTripData =async()=>{
     const docRef = doc(db,'AITrips',tripId);
     const docSnap = await getDoc(docRef);
