@@ -12,7 +12,7 @@ function ViewTrip() {
   useEffect(()=>{
     tripId && GetTripData();
 
-  },[tripId])
+  },[tripId]);
 
   // Used to get information from firebase
   const GetTripData =async()=>{

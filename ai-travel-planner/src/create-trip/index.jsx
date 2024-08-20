@@ -125,7 +125,7 @@ function CreateTrip() {
           params: {
             key: 'pk.c51ba700c7aa3288f19b95fbaddbaeff',
             q: value,
-            limit: 50,
+            limit: 100,
             dedupe: 1,
           },
         });
