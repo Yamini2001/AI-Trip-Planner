@@ -4,6 +4,7 @@ import {db} from "@/service/firebaseConfig";
 import {doc,getDoc} from 'firebase/firestore';
 import {toast} from 'sonner';
 import InfoSection from '../components/InfoSection';
+import Hotels from '../components/Hotels';
 
 function ViewTrip() {
   const {tripId} = useParams();
@@ -32,6 +33,7 @@ function ViewTrip() {
       {/* Information Section */}
       <InfoSection trip = {trip}/>
       {/* Recommeded Hotels */}
+      <Hotels trip = {trip}/>
       {/* Daily Plan */}
       {/* Footer */}
     </div>
