@@ -14,13 +14,13 @@ function Hotels({ trip }) {
 
   return (
     <div className="mt-1">
-      <h2 className='font-bold text-xl mb-1'>Hotel Recommendations</h2>
+      <h2 className='font-bold text-xl mb-3'>Hotel Recommendations</h2>
       <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
         {hasHotels ? (
           hotelOptions.map((hotel, index) => (
             <Link
               key={index}
-              to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel?.address || '')}`}
+              to={'https://www.google.com/maps/search/?api=1&query='+hotel?.hotelName+","+hotel?.hotelAddress}
               className="hover:scale-105 transition-transform cursor-pointer"
               target='_blank'
               rel='noopener noreferrer'
