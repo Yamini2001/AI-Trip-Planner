@@ -1,7 +1,7 @@
 // import React from 'react'
 import placeImage from '../place.png';
 
-function PlaceCardItem(place) {
+function PlaceCardItem({place}) {
   return (
     <div className='border rounded-xl p-3 mt-2 flex gap-5'>
       <img src = {placeImage}
