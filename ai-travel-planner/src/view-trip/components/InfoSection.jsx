@@ -1,21 +1,43 @@
-// import React from 'react';
-import place from '../place.png';
+import { useState, useEffect } from 'react';
 import { IoIosSend } from "react-icons/io";
 import { IoLocationSharp } from "react-icons/io5"; // Import location icon
+import { GetPlaceDetails } from '../../service/GlobalApi';
+
+const PHOTO_REF_URL = 'https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=1000&maxWidthPx=1000&key=' + import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
 
 function InfoSection({ trip }) {
-  // Check if trip data is available
+  const [photoUrl, setPhotoUrl] = useState();
+
+  useEffect(() => {
+    const fetchPlacePhoto = async () => {
+      if (!trip || !trip.userSelection || !trip.userSelection.location) return;
+      
+      const data = {
+        textQuery: trip.userSelection.location?.display_place
+      };
+
+      try {
+        const result = await GetPlaceDetails(data);
+        const photoName = result.data.places[0].photos[3].name;
+        const photoUrl = PHOTO_REF_URL.replace('{NAME}', photoName);
+        setPhotoUrl(photoUrl);
+      } catch (error) {
+        console.error('Error fetching place details:', error.response ? error.response.data : error.message);
+      }
+    };
+
+    fetchPlacePhoto();
+  }, [trip]);
+
   if (!trip || !trip.userSelection) {
     return <div>Loading...</div>;
   }
-
-  console.log(trip); // Log to verify the structure and contents
 
   return (
     <div className="flex flex-col justify-start items-center h-screen">
       <div className="relative w-full">
         <img 
-          src={place}
+          src={photoUrl}
           alt="Trip Placeholder" 
           className="h-[470px] w-full object-cover rounded-xl mb-4"
         />
