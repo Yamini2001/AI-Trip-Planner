@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/Button'; // Ensure Button component is also using Tailwind classes
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {googleLogout} from '@react-oauth/google';
+// import {useNavigation} from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader,DialogDescription} from "@/components/ui/dialog";
 
 function Header() {
     const [user, setUser] = useState(null);
+    const [openDialog,setOpenDialog] = useState();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -31,7 +40,20 @@ function Header() {
                             My Trips
                         </Button>
                         {user.picture && (
+                           
+                            <Popover>
+                            <PopoverTrigger>
                             <img src={user.picture} alt="User Avatar" className="h-[35px] w-[35px] rounded-full" />
+                            </PopoverTrigger>
+                             <PopoverContent>
+                              <h2 className= 'cursor-pointer' onClick={()=>{
+                                googleLogout();
+                                localStorage.clear();
+                                window.location.reload();
+                              }}>Logout</h2>
+                             </PopoverContent>
+                            </Popover>
+
                         )}
                     </div>
                 ) : (
@@ -42,6 +64,27 @@ function Header() {
                     </Button>
                 )}
             </div>
+            <Dialog open={openDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogDescription>
+          <img
+              src={travelPlannerLogo}
+              className="w-1/4 h-auto mx-auto rounded-lg mb-5"
+              alt="logo"/>
+          <h2 className='font-bold text-lg mt-7'>Sign In With Google</h2>
+          <p>Sign in to the App with Google authentication securely.</p>
+          <button disabled={loading}
+          onClick={login}
+          className='w-full mt-5 flex gap-4 items-center justify-center p-3 bg-green-600 text-white rounded hover:bg-green-700 transition duration-300'>
+              <FcGoogle className='h-7 w-7'/>
+              Sign In With Google
+            </button>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+
+      </Dialog> 
         </div>
     );
 }
