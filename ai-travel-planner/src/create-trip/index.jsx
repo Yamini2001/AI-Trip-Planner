@@ -11,6 +11,7 @@ import { db } from "@/service/firebaseConfig";
 import travelPlannerLogo from '@/assets/travelplanner.png';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {useNavigate} from 'react-router-dom';
+// import placeImage from './place.png';
 
 
 const AI_PROMPT = `Plan a trip to {location} for {totalDays} days. I will be traveling with {traveler} and my budget is {budget}.`;
@@ -166,7 +167,7 @@ function CreateTrip() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-orange-400 to-yellow-300 p-10">
+    <div className="min-h-screen bg-gradient-to-b from-white-300 via-blue-100 to-white p-2 relative border-none">
       <h2 className="font-bold text-3xl text-gray-800">Tell us your travel preferences🏕️🌴</h2>
       <p className="mt-3 text-gray-500 text-xl">
         Just provide basic information, and our trip planner will generate a customized itinerary based on your preferences.
@@ -244,7 +245,7 @@ function CreateTrip() {
       </div>
       <div className='my-10 justify-end flex'>
         <button disabled={loading}
-        className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-gray-800" onClick={onGenerateTrip}>
+        className="bg-black text-white rounded px-4 py-2 mt-10 transition-all duration-200 hover:bg-blue-500" onClick={onGenerateTrip}>
         {
               loading?
               <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin'/>: 'Generate Trip'
@@ -264,7 +265,7 @@ function CreateTrip() {
           <p>Sign in to the App with Google authentication securely.</p>
           <button disabled={loading}
           onClick={login}
-          className='w-full mt-5 flex gap-4 items-center'>
+          className='w-full mt-5 flex gap-4 items-center justify-center p-3 bg-green-600 text-white rounded hover:bg-green-700 transition duration-300'>
               <FcGoogle className='h-7 w-7'/>
               Sign In With Google
             </button>
