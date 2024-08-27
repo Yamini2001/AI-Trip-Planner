@@ -8,6 +8,7 @@ import {
 import {googleLogout} from '@react-oauth/google';
 // import {useNavigation} from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader,DialogDescription} from "@/components/ui/dialog";
+import travelPlannerLogo from '../../create-trip/place.png';
 
 function Header() {
     const [user, setUser] = useState(null);
@@ -25,6 +26,11 @@ function Header() {
             }
         }
     }, []);
+
+    const login = useGoogleLogin({
+      onSuccess: (codeResp) => GetUserProfile(codeResp),
+      onError: (error) => console.log(error),
+    });
 
     return (
         <div className="header bg-gradient-to-b from-white-300 via-white-100 to-white text-black">
@@ -57,7 +63,7 @@ function Header() {
                         )}
                     </div>
                 ) : (
-                    <Button
+                    <Button onClick={()=>setOpenDialog(true)}
                         className="button bg-black text-white border-none py-2 px-4 text-lg cursor-pointer transition ease-in-out duration-300 mr-10 rounded-lg hover:bg-white hover:text-black -mt-4"
                     >
                         Sign In
