@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react';
 import { IoIosSend } from "react-icons/io";
 import { IoLocationSharp } from "react-icons/io5"; // Import location icon
-import { GetPlaceDetails } from '../../service/GlobalApi';
+import fetchPhoto from '../../service/GlobalApi'; // Import the Unsplash service
+import placeImage from '../place.png';
 
-const PHOTO_REF_URL = 'https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=1000&maxWidthPx=1000&key=' + import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
+// Define a placeholder for photos as fallback
+const PHOTO_REF_URL = 'https://via.placeholder.com/1000?text=Photo+Not+Available';
 
 function InfoSection({ trip }) {
-  const [photoUrl, setPhotoUrl] = useState();
+  const [photoUrl, setPhotoUrl] = useState(PHOTO_REF_URL);
 
   useEffect(() => {
     const fetchPlacePhoto = async () => {
       if (!trip || !trip.userSelection || !trip.userSelection.location) return;
-      
-      const data = {
-        textQuery: trip.userSelection.location?.display_place
-      };
+
+      const query = trip.userSelection.location?.display_place;
 
       try {
-        const result = await GetPlaceDetails(data);
-        const photoName = result.data.places[0].photos[3].name;
-        const photoUrl = PHOTO_REF_URL.replace('{NAME}', photoName);
-        setPhotoUrl(photoUrl);
+        // Fetch photo from Unsplash based on the location query
+        const photo = await fetchPhoto(query);
+        setPhotoUrl(photo);
       } catch (error) {
-        console.error('Error fetching place details:', error.response ? error.response.data : error.message);
+        console.error('Error fetching place photo:', error.message);
+        setPhotoUrl(PHOTO_REF_URL); // Use the placeholder in case of an error
       }
     };
 
@@ -37,7 +37,7 @@ function InfoSection({ trip }) {
     <div className="flex flex-col justify-start items-center h-screen">
       <div className="relative w-full">
         <img 
-          src={photoUrl}
+          src={photoUrl?photoUrl:placeImage}
           alt="Trip Placeholder" 
           className="h-[470px] w-full object-cover rounded-xl mb-4"
         />
