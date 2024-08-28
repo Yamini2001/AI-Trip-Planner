@@ -21,12 +21,12 @@ function HotelCardItem({ hotel }) {
         try {
             const response = await axios.get(UNSPLASH_API_URL, {
                 params: {
-                    query: hotel.hotelName,
+                    query: `${hotel.hotelName} hotel ${hotel.hotelAddress}`,
                     client_id: UNSPLASH_ACCESS_KEY,
                     per_page: 1,
                 },
             });
-
+    
             const photo = response.data.results[0];
             if (photo) {
                 setPhotoUrl(photo.urls.small);
@@ -36,6 +36,7 @@ function HotelCardItem({ hotel }) {
             setPhotoUrl(PHOTO_REF_URL); // Fallback to placeholder if there's an error
         }
     };
+    
 
     return (
         <Link
@@ -52,7 +53,7 @@ function HotelCardItem({ hotel }) {
                 />
                 <div className="flex flex-col gap-2">
                     <h2 className="font-medium text-lg">{hotel?.hotelName || 'Unknown Hotel'}</h2>
-                    <h2 className="text-sm text-gray-500">📍 {hotel?.hotelAddress}</h2>
+                    <h2 className="text-sm text-gray-500">📍 {hotelAddress}</h2>
                     <h2 className="text-sm text-gray-700">💰 {hotel?.price || 'Price not available'}</h2>
                     <h2 className="text-sm text-yellow-500">⭐ {hotel?.rating || 'Rating not available'}</h2>
                 </div>
