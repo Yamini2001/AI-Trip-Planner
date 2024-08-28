@@ -9,11 +9,19 @@ const PHOTO_REF_URL = 'https://via.placeholder.com/1000?text=Photo+Not+Available
 
 function HotelCardItem({ hotel }) {
     const [photoUrl, setPhotoUrl] = useState(PHOTO_REF_URL);
-    const [hotelAddress, setHotelAddress] = useState(hotel?.hotelAddress || 'Address not available');
+    const [hotelAddress, setHotelAddress] = useState('Address not available');
 
     useEffect(() => {
-        if (hotel) {
+        // Update hotel address if provided
+        if (hotel?.hotelAddress) {
+            setHotelAddress(hotel.hotelAddress);
+        }
+
+        // Fetch hotel photo if hotel data is available
+        if (hotel?.hotelName && hotel?.hotelAddress) {
             fetchHotelPhoto();
+        } else {
+            setPhotoUrl(PHOTO_REF_URL); // Reset to placeholder if no hotel data
         }
     }, [hotel]);
 
@@ -26,28 +34,29 @@ function HotelCardItem({ hotel }) {
                     per_page: 1,
                 },
             });
-    
+
             const photo = response.data.results[0];
             if (photo) {
                 setPhotoUrl(photo.urls.small);
+            } else {
+                setPhotoUrl(PHOTO_REF_URL); // Fallback to placeholder if no photo found
             }
         } catch (error) {
             console.error('Error fetching hotel photo:', error);
             setPhotoUrl(PHOTO_REF_URL); // Fallback to placeholder if there's an error
         }
     };
-    
 
     return (
         <Link
-            to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel?.hotelName + "," + hotel?.hotelAddress)}`}
+            to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel?.hotelName || ''}, ${hotelAddress}`)}`}
             className="hover:scale-105 transition-transform cursor-pointer"
             target="_blank"
             rel="noopener noreferrer"
         >
             <div className="rounded-lg bg-white shadow-lg p-4">
                 <img 
-                    src={photoUrl?photoUrl:placeImage} 
+                    src={photoUrl || placeImage} 
                     alt="Hotel" 
                     className="w-full h-48 object-cover rounded-lg mb-4"
                 />
