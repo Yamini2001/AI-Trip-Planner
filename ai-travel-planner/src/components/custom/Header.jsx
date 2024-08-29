@@ -1,77 +1,123 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/Button'; // Ensure Button component is also using Tailwind classes
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {googleLogout} from '@react-oauth/google';
-// import {useNavigation} from 'react-router-dom';
-// import { Dialog, DialogContent, DialogHeader,DialogDescription} from "@/components/ui/dialog";
-// import travelPlannerLogo from '../../create-trip/place.png';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import { Dialog, DialogContent, DialogHeader, DialogDescription } from '@/components/ui/dialog';
+import travelPlannerLogo from '../../assets/travelplanner.png';
+import axios from 'axios'; // Import axios for API requests
+import { FcGoogle } from 'react-icons/fc'; // Import Google icon for sign-in button
 
 function Header() {
-    const [user, setUser] = useState(null);
-    // const [openDialog,setOpenDialog] = useState();
+  const [user, setUser] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false); // State to manage loading status for the sign-in button
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                const parsedUser = JSON.parse(storedUser);
-                setUser(parsedUser);
-                console.log(parsedUser);
-            } catch (error) {
-                console.error('Error parsing user data from localStorage:', error);
-            }
-        }
-    }, []);
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
-    // const login = useGoogleLogin({
-    //   onSuccess: (codeResp) => GetUserProfile(codeResp),
-    //   onError: (error) => console.log(error),
-    // });
+  const login = useGoogleLogin({
+    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onError: (error) => console.log(error),
+  });
 
-    return (
-        <div className="header bg-gradient-to-b from-white-300 via-white-100 to-white text-black">
-            <div className="header-content p-3 shadow-sm flex justify-between items-center px-5">
-                <img
-                    src="/travelplanner.png"
-                    alt="Travel Planner Logo"
-                    className="logo max-w-[12%] h-auto max-h-[30%] ml-1 bg-blue rounded-lg -mt-4 shadow-none"
-                />
-                {user ? (
-                    <div className="flex items-center gap-3">
-                        <Button variant="outline" className="rounded-full">
-                            My Trips
-                        </Button>
-                        {user.picture && (
-                           
-                            <Popover>
-                            <PopoverTrigger>
-                            <img src={user.picture} alt="User Avatar" className="h-[35px] w-[35px] rounded-full" />
-                            </PopoverTrigger>
-                             <PopoverContent>
-                              <h2 className= 'cursor-pointer' onClick={()=>{
-                                googleLogout();
-                                localStorage.clear();
-                                window.location.reload();
-                              }}>Logout</h2>
-                             </PopoverContent>
-                            </Popover>
+  const GetUserProfile = (tokenInfo) => {
+    setLoading(true); // Set loading to true when fetching user profile
+    axios
+      .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
+        headers: {
+          Authorization: `Bearer ${tokenInfo?.access_token}`,
+          Accept: 'application/json',
+        },
+      })
+      .then((resp) => {
+        console.log(resp);
+        localStorage.setItem('user', JSON.stringify(resp.data));
+        setUser(resp.data); // Update user state with the fetched user data
+        setOpenDialog(false);
+        setLoading(false); // Set loading to false after fetching user profile
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false); // Set loading to false if there's an error
+      });
+  };
 
-                        )}
-                    </div>
-                ) : (
-                    <Button onClick={()=>setOpenDialog(true)}
-                        className="button bg-black text-white border-none py-2 px-4 text-lg cursor-pointer transition ease-in-out duration-300 mr-10 rounded-lg hover:bg-white hover:text-black -mt-4"
+  return (
+    <div className="header bg-gradient-to-b from-white-300 via-white-100 to-white text-black">
+      <div className="header-content p-3 shadow-sm flex justify-between items-center px-5">
+        <img
+          src={travelPlannerLogo}
+          alt="Travel Planner Logo"
+          className="logo max-w-[12%] h-auto max-h-[30%] ml-1 bg-blue rounded-lg -mt-4 shadow-none"
+        />
+        <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              <Button variant="outline" className="rounded-full">
+                My Trips
+              </Button>
+              {user.picture && (
+                <Popover>
+                  <PopoverTrigger>
+                    <img src={user.picture} alt="User Avatar" className="h-[35px] w-[35px] rounded-full" />
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <h2
+                      className="cursor-pointer"
+                      onClick={() => {
+                        googleLogout();
+                        localStorage.clear();
+                        window.location.reload();
+                      }}
                     >
-                        Sign In
-                    </Button>
-                )}
-            </div>
+                      Logout
+                    </h2>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={() => setOpenDialog(true)}
+                className="button bg-black text-white border-none py-2 px-4 text-lg cursor-pointer transition ease-in-out duration-300 mr-10 rounded-lg hover:bg-white hover:text-black -mt-4"
+              >
+                Sign In
+              </Button>
+            </>
+          )}
         </div>
-    );
+      </div>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <img
+                src={travelPlannerLogo}
+                className="w-1/4 h-auto mx-auto rounded-lg mb-5"
+                alt="logo"
+              />
+              <h2 className="font-bold text-lg mt-7">Sign In With Google</h2>
+              <p>Sign in to the App with Google authentication securely.</p>
+              <button
+                disabled={loading}
+                onClick={login}
+                className="w-full mt-5 flex gap-4 items-center justify-center p-3 bg-black text-white rounded hover:bg-gray-800 transition duration-300"
+              >
+                <FcGoogle className="h-7 w-7" />
+                Sign In With Google
+              </button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
 
 export default Header;
