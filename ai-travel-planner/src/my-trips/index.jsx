@@ -1,14 +1,14 @@
-import React from 'react'
-// import { Button } from '../ui/Button'; 
+import React from 'react';
+import { Button } from '../components/ui/Button'; // Correct usage for named export
 
-function index() {
+function Index() {
   return (
     <div>
       <Button variant="outline" className="rounded-full">
-                My Trips
-              </Button>
+        My Trips
+      </Button>
     </div>
-  )
+  );
 }
 
-export default index
+export default Index;

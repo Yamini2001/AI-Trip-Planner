@@ -14,7 +14,7 @@ function InfoSection({ trip }) {
     const fetchPlacePhoto = async () => {
       if (!trip || !trip.userSelection || !trip.userSelection.location) return;
 
-      const query = trip.userSelection.location?.display_place;
+      const query = trip.userSelection.location?.display_name;
 
       try {
         // Fetch photo from Unsplash based on the location query
@@ -50,7 +50,7 @@ function InfoSection({ trip }) {
         <div className="flex items-center gap-2 mb-4">
           <IoLocationSharp className="text-xl text-gray-600" />
           <h2 className='font-bold text-2xl'>
-            {trip.userSelection.location?.display_place || 'Location not available'}
+            {trip.userSelection.location?.display_name || 'Location not available'}
           </h2>
         </div>
         <div className='flex gap-5 justify-start'>

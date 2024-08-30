@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../ui/Button'; // Ensure Button component is also using Tailwind classes
+import { Button } from '../ui/Button'; 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { googleLogout, useGoogleLogin } from '@react-oauth/google';
 import { Dialog, DialogContent, DialogHeader, DialogDescription } from '@/components/ui/dialog';
@@ -20,16 +20,16 @@ function Header() {
   }, []);
 
   const login = useGoogleLogin({
-    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onSuccess: (tokenInfo) => GetUserProfile(tokenInfo),
     onError: (error) => console.log(error),
   });
 
   const GetUserProfile = (tokenInfo) => {
     setLoading(true); // Set loading to true when fetching user profile
     axios
-      .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
+      .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo.access_token}`, {
         headers: {
-          Authorization: `Bearer ${tokenInfo?.access_token}`,
+          Authorization: `Bearer ${tokenInfo.access_token}`,
           Accept: 'application/json',
         },
       })
@@ -39,12 +39,17 @@ function Header() {
         setUser(resp.data); // Update user state with the fetched user data
         setOpenDialog(false);
         setLoading(false); // Set loading to false after fetching user profile
-        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
         setLoading(false); // Set loading to false if there's an error
       });
+  };
+
+  const handleLogout = () => {
+    googleLogout();
+    localStorage.clear();
+    setUser(null); // Update the state to reflect user is logged out
   };
 
   return (
@@ -58,9 +63,11 @@ function Header() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <Button variant="outline" className="rounded-full">
-                My Trips
-              </Button>
+              <a href='/my-trips'>
+                <Button className="rounded-full">
+                  My Trips
+                </Button>
+              </a>
               {user.picture && (
                 <Popover>
                   <PopoverTrigger>
@@ -69,11 +76,7 @@ function Header() {
                   <PopoverContent>
                     <h2
                       className="cursor-pointer"
-                      onClick={() => {
-                        googleLogout();
-                        localStorage.clear();
-                        window.location.reload();
-                      }}
+                      onClick={handleLogout}
                     >
                       Logout
                     </h2>
@@ -82,14 +85,12 @@ function Header() {
               )}
             </>
           ) : (
-            <>
-              <Button
-                onClick={() => setOpenDialog(true)}
-                className="button bg-black text-white border-none py-2 px-4 text-lg cursor-pointer transition ease-in-out duration-300 mr-10 rounded-lg hover:bg-white hover:text-black -mt-4"
-              >
-                Sign In
-              </Button>
-            </>
+            <button
+              onClick={() => setOpenDialog(true)}
+              className="button bg-black text-white border-none py-2 px-4 text-lg cursor-pointer transition ease-in-out duration-300 mr-10 rounded-lg hover:bg-white hover:text-black -mt-4"
+            >
+              Sign In
+            </button>
           )}
         </div>
       </div>
@@ -110,7 +111,7 @@ function Header() {
                 className="w-full mt-5 flex gap-4 items-center justify-center p-3 bg-black text-white rounded hover:bg-gray-800 transition duration-300"
               >
                 <FcGoogle className="h-7 w-7" />
-                Sign In With Google
+                {loading ? 'Loading...' : 'Sign In With Google'}
               </button>
             </DialogDescription>
           </DialogHeader>
