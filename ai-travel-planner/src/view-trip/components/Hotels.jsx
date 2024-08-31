@@ -13,8 +13,9 @@ function Hotels({ trip }) {
   console.log('Hotel Options:', hotelOptions);
 
   return (
-    <div className="mb-6">
-      <h2 className='font-bold text-xl mb-2'>Hotel Recommendations</h2>
+    <div className="mb-10">
+      {/* Adjust the top margin to control vertical spacing */}
+      <h2 className="font-bold text-xl mt-0">Hotel Recommendations</h2>
       <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
         {hasHotels ? (
           hotelOptions.map((hotel, index) => (
@@ -27,10 +28,10 @@ function Hotels({ trip }) {
           <div className="rounded-lg bg-white shadow-md p-2 flex flex-col items-center justify-center">
             <img 
               src={placeImage} 
-              className='w-32 h-32 rounded-lg mb-2 object-cover' 
+              className="w-32 h-32 rounded-lg mb-2 object-cover" 
               alt="Hotel Placeholder" 
             />
-            <h2 className='text-gray-500 text-center'>No hotels available for this location.</h2>
+            <h2 className="text-gray-500 text-center">No hotels available for this location.</h2>
           </div>
         )}
       </div>
