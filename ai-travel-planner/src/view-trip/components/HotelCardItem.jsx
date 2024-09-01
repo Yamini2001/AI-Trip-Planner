@@ -4,7 +4,7 @@ import axios from 'axios';
 import placeImage from '../place.png'; // Ensure this path is correct
 
 const UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos';
-const UNSPLASH_ACCESS_KEY = 'MYf-UXFsQbzryZ52hZ_F7d_VZXu6X4Jh3lQVbrDVETA'; // Replace with your actual Unsplash access key
+const UNSPLASH_ACCESS_KEY = 'YOUR_UNSPLASH_ACCESS_KEY'; // Replace with your actual Unsplash access key
 const PHOTO_REF_URL = 'https://via.placeholder.com/1000?text=Photo+Not+Available';
 
 function HotelCardItem({ hotel }) {
@@ -28,8 +28,7 @@ function HotelCardItem({ hotel }) {
                     },
                 });
 
-                console.log('Unsplash API response:', response.data); // Log the entire response
-
+                // Ensure there are results and access the URLs object safely
                 const photo = response.data.results[0];
                 if (photo && photo.urls && photo.urls.small) {
                     setPhotoUrl(photo.urls.small);
@@ -55,7 +54,7 @@ function HotelCardItem({ hotel }) {
         >
             <div className="rounded-lg bg-white shadow-lg p-4">
                 <img 
-                    src={photoUrl || PHOTO_REF_URL} 
+                    src={photoUrl} 
                     alt={`${hotel.hotelName || 'Hotel'}`} 
                     className="w-full h-48 object-cover rounded-lg mb-4"
                 />
