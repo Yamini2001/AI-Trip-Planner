@@ -39,6 +39,7 @@ function Header() {
         setUser(resp.data); // Update user state with the fetched user data
         setOpenDialog(false);
         setLoading(false); // Set loading to false after fetching user profile
+        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
