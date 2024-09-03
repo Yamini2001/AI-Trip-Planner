@@ -12,13 +12,14 @@ function HotelCardItem({ hotel }) {
 
     useEffect(() => {
         const fetchHotelPhoto = async () => {
-            // Check if hotel object is valid
             if (!hotel || !hotel.hotelName || !hotel.hotelAddress) {
                 console.warn('Missing hotel data:', hotel);
                 return;
             }
 
             const query = `${hotel.hotelName} hotel ${hotel.hotelAddress}`;
+            console.log('Fetching photo for:', query); // Log the query
+
             try {
                 const response = await axios.get(UNSPLASH_API_URL, {
                     params: {
@@ -27,8 +28,8 @@ function HotelCardItem({ hotel }) {
                         per_page: 1,
                     },
                 });
+                console.log('Unsplash response:', response.data); // Log the response
 
-                // Ensure there are results and access the URLs object safely
                 const photo = response.data.results[0];
                 if (photo && photo.urls && photo.urls.small) {
                     setPhotoUrl(photo.urls.small);
@@ -54,7 +55,7 @@ function HotelCardItem({ hotel }) {
         >
             <div className="rounded-lg bg-white shadow-lg p-4">
                 <img 
-                    src={photoUrl} 
+                    src={photoUrl || placeImage} 
                     alt={`${hotel.hotelName || 'Hotel'}`} 
                     className="w-full h-48 object-cover rounded-lg mb-4"
                 />
