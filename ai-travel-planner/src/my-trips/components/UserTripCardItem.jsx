@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import fetchPhoto from '../../service/GlobalApi'; // Import the Unsplash service
 import placeImage from '../place.png';
+import {Link} from 'react-router-dom';
 
 // Define a placeholder for photos as fallback
 const PHOTO_REF_URL = 'https://via.placeholder.com/1000?text=Photo+Not+Available';
@@ -32,7 +33,8 @@ function UserTripCardItem({ trip }) {
     }
 
     return (
-        <div className="flex flex-col items-center">
+        <Link to={'/view-trip/'+trip?.id}>
+        <div className="hover:scale-105 transition-all flex flex-col items-center">
             <div className="relative w-full max-w-sm"> {/* Adjusted the max width */}
                 <img 
                     src={photoUrl || placeImage} 
@@ -44,11 +46,12 @@ function UserTripCardItem({ trip }) {
                         {trip.userSelection.location?.display_name || 'Location not available'}
                     </h2>
                     <h2 className="text-sm text-gray-500">
-                        {trip?.userSelection?.noOfDays || 'N/A'} Days trip with {trip?.userSelection?.budget || 'N/A'} Budget
+                        {trip?.userSelection?.days || 'N/A'} Days trip with {trip?.userSelection?.budget || 'N/A'} Budget
                     </h2>
                 </div>
             </div>
         </div>
+        </Link>
     );
 }
 
