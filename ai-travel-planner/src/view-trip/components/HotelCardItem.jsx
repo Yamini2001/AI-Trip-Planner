@@ -26,14 +26,24 @@ function HotelCardItem({ hotel }) {
     }, [hotel]);
 
     return (
-        <Link to={`https://www.google.com/maps/search/?api=1&query=${hotel.hotelName},${hotel.hotelAddress}`}>
+        <Link to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelName)},${encodeURIComponent(hotel.hotelAddress)}`}>
             <div className="hover:scale-105 transition-all cursor-pointer">
-                <img src={photoUrl || placeImage} className="rounded-xl h-[100px] w-full object-cover" alt={hotel?.hotelName} />
+                <img 
+                    src={photoUrl} 
+                    className="rounded-xl h-[100px] w-full object-cover" 
+                    alt={`Image of ${hotel.hotelName}`} 
+                />
                 <div className="my-2 flex flex-col gap-2">
-                    <h2 className="font-medium">{hotel?.hotelName}</h2>
-                    <h2 className="text-xs text-gray-500">📍 {hotel?.hotelAddress}</h2>
-                    <h2 className="text-xs text-gray-500">💰 {hotel?.price}</h2>
-                    <h2 className="text-xs text-gray-500">⭐ {hotel?.rating}</h2>
+                    <h2 className="font-medium">{hotel?.hotelName || 'Hotel Name Not Available'}</h2>
+                    <h2 className="text-xs text-gray-500">
+                        📍 {hotel?.hotelAddress || 'Address Not Available'}
+                    </h2>
+                    <h2 className="text-xs text-gray-500">
+                        💰 {hotel?.price || 'Price Not Available'}
+                    </h2>
+                    <h2 className="text-xs text-gray-500">
+                        ⭐ {hotel?.rating || 'Rating Not Available'}
+                    </h2>
                 </div>
             </div>
         </Link>
