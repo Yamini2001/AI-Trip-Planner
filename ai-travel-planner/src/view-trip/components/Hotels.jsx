@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import placeImage from '../place.png'; // Ensure this path is correct
 import HotelCardItem from './HotelCardItem'; // Ensure this import path is correct
 

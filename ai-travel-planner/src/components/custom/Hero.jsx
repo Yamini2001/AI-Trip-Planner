@@ -1,6 +1,8 @@
 import { Button } from "../ui/Button";
 import {Link} from 'react-router-dom';
 // import React from 'react';
+import placeImage from '../../assets/tripplan.png';
+
 
 function Hero() {
   return (
@@ -17,7 +19,7 @@ function Hero() {
         Get Started, It&#39;s Free
       </Button>
       </Link>
-      <img src = '/'/>
+      <img src = {placeImage} className=" h-[420px] -mb-[380px]"/>
     </div>
   );
 }
