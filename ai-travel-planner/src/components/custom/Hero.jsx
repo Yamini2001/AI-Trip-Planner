@@ -17,6 +17,7 @@ function Hero() {
         Get Started, It&#39;s Free
       </Button>
       </Link>
+      <img src = '/'/>
     </div>
   );
 }

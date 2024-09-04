@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogDescription } from '@/compon
 import travelPlannerLogo from '../../assets/travelplanner.png';
 import axios from 'axios'; // Import axios for API requests
 import { FcGoogle } from 'react-icons/fc'; // Import Google icon for sign-in button
+// import { LuPlus } from "react-icons/lu";
 
 function Header() {
   const [user, setUser] = useState(null);
@@ -64,6 +65,11 @@ function Header() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              <a href='/create-trip'>
+                <Button className="rounded-full">
+                + Create Trip
+                </Button>
+              </a>
               <a href='/my-trips'>
                 <Button className="rounded-full">
                   My Trips
