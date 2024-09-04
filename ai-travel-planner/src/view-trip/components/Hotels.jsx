@@ -15,7 +15,7 @@ function Hotels({ trip }) {
   return (
     <div className="mb-10">
       {/* Adjust the top margin to control vertical spacing */}
-      <h2 className="font-bold text-xl mt-0">Hotel Recommendations</h2>
+      <h2 className="font-bold text-xl mt-0">Hotel Recommendation</h2>
       <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
         {hasHotels ? (
           hotelOptions.map((hotel, index) => (
