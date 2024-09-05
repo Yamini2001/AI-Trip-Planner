@@ -1,49 +1,117 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import fetchPhoto from '../../service/GlobalApi'; // Import the Unsplash service
-import placeImage from '../place.png';
+import axios from 'axios';
+import placeImage from '../place.png'; // Ensure this path is correct
 
+const UNSPLASH_API_URL = 'https://api.unsplash.com/search/photos';
+const UNSPLASH_ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY; // Correctly access the environment variable
+const LOCATIONIQ_API_KEY = 'pk.c51ba700c7aa3288f19b95fbaddbaeff'; // Replace with your LocationIQ API key
 const PHOTO_REF_URL = 'https://via.placeholder.com/1000?text=Photo+Not+Available';
 
 function HotelCardItem({ hotel }) {
     const [photoUrl, setPhotoUrl] = useState(PHOTO_REF_URL);
+    const [userLocation, setUserLocation] = useState(null);
 
     useEffect(() => {
+        // Get user's current location
+        const getUserLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const { latitude, longitude } = position.coords;
+                    setUserLocation({ latitude, longitude });
+                }, (error) => {
+                    console.error('Error getting user location:', error);
+                });
+            } else {
+                console.warn('Geolocation is not supported by this browser.');
+            }
+        };
+
+        getUserLocation();
+    }, []);
+
+    useEffect(() => {
+        // Fetch hotel photo from Unsplash
         const fetchHotelPhoto = async () => {
-            if (!hotel || !hotel.hotelName) return;
+            if (!hotel || !hotel.hotelName || !hotel.hotelAddress) {
+                console.warn('Missing hotel data:', hotel);
+                return;
+            }
+
+            const query = `${hotel.hotelName} ${hotel.hotelAddress}`;
+            console.log('Fetching photo for:', query);
 
             try {
-                // Fetch photo based on the hotel name
-                const photo = await fetchPhoto(hotel.hotelName);
-                setPhotoUrl(photo || PHOTO_REF_URL);
+                const response = await axios.get(UNSPLASH_API_URL, {
+                    params: {
+                        query: query,
+                        client_id: UNSPLASH_ACCESS_KEY,
+                        per_page: 1,
+                    },
+                });
+
+                const photo = response.data.results[0];
+                if (photo && photo.urls && photo.urls.small) {
+                    setPhotoUrl(photo.urls.small);
+                } else {
+                    console.warn('No photos found for query:', query);
+                    setPhotoUrl(PHOTO_REF_URL); // Use placeholder if no photo found
+                }
             } catch (error) {
                 console.error('Error fetching hotel photo:', error.message);
-                setPhotoUrl(PHOTO_REF_URL); // Use the placeholder in case of an error
+                setPhotoUrl(PHOTO_REF_URL); // Fallback to placeholder in case of error
             }
         };
 
         fetchHotelPhoto();
     }, [hotel]);
 
+    useEffect(() => {
+        // Fetch hotels based on user location
+        const fetchHotels = async (latitude, longitude) => {
+            try {
+                const response = await fetch(`https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=hotels&lat=${latitude}&lon=${longitude}&format=json`);
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    // Optionally, set hotel data if needed
+                    console.log('Nearby Hotels:', data);
+                } else {
+                    console.warn('No hotels found for location:', { latitude, longitude });
+                }
+            } catch (error) {
+                console.error('Error fetching hotels:', error);
+            }
+        };
+
+        if (userLocation) {
+            fetchHotels(userLocation.latitude, userLocation.longitude);
+        }
+    }, [userLocation]);
+
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hotel.hotelName}, ${hotel.hotelAddress}`)}${hotel.latitude ? `&ll=${hotel.latitude},${hotel.longitude}` : ''}`;
+
     return (
-        <Link to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelName)},${encodeURIComponent(hotel.hotelAddress)}`}>
-            <div className="hover:scale-105 transition-all cursor-pointer">
+        <Link
+            to={googleMapsUrl}
+            className="hover:scale-105 transition-transform cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <div className="rounded-lg bg-white shadow-lg p-4">
                 <img 
-                    src={photoUrl} 
-                    className="rounded-xl h-[100px] w-full object-cover" 
-                    alt={`Image of ${hotel.hotelName}`} 
+                    src={photoUrl || placeImage} 
+                    alt={`${hotel.hotelName || 'Hotel'}`} 
+                    className="w-full h-48 object-cover rounded-lg mb-4"
                 />
-                <div className="my-2 flex flex-col gap-2">
-                    <h2 className="font-medium">{hotel?.hotelName || 'Hotel Name Not Available'}</h2>
-                    <h2 className="text-xs text-gray-500">
-                        📍 {hotel?.hotelAddress || 'Address Not Available'}
-                    </h2>
-                    <h2 className="text-xs text-gray-500">
-                        💰 {hotel?.price || 'Price Not Available'}
-                    </h2>
-                    <h2 className="text-xs text-gray-500">
-                        ⭐ {hotel?.rating || 'Rating Not Available'}
-                    </h2>
+                <div className="flex flex-col gap-2">
+                    <h2 className="font-medium text-lg">{hotel?.hotelName || 'Unknown Hotel'}</h2>
+                    <h2 className="text-sm text-gray-500">📍 {hotel?.hotelAddress || 'Address not available'}</h2>
+                    <h2 className="text-sm text-gray-700">💰 {hotel?.price || 'Price not available'}</h2>
+                    <h2 className="text-sm text-yellow-500">⭐ {hotel?.rating || 'Rating not available'}</h2>
+                    {hotel?.latitude && hotel?.longitude && (
+                        <p className="text-sm text-gray-600">🌍 Latitude: {hotel.latitude}, Longitude: {hotel.longitude}</p>
+                    )}
                 </div>
             </div>
         </Link>
